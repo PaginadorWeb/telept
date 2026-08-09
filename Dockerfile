@@ -7,6 +7,9 @@ RUN apt-get update \
         ca-certificates \
         fontconfig \
         fonts-liberation \
+        g++ \
+        make \
+        python3 \
         libasound2 \
         libatk-bridge2.0-0 \
         libatk1.0-0 \
