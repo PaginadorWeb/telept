@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TelePT — Telemóveis e preços PT</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">Tele<span>PT</span></div>
+    <div class="search-box">
+      <input id="searchInput" type="search" placeholder="Pesquisar... (ex: Flip 8, S25)" autocomplete="off">
+      <button id="searchBtn">Buscar</button>
+    </div>
+  </header>
+
+  <nav id="brandBar" class="brand-bar"></nav>
+
+  <main>
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <h1>Compara telemóveis e preços em Portugal</h1>
+        <p>Specs completas + preços MEO, Vodafone e NOS lado a lado.</p>
+      </div>
+      <div id="results" class="grid"></div>
+      <div id="status" class="status"></div>
+    </section>
+
+    <section id="detailView" class="view">
+      <button class="back" onclick="go('home')">‹ Voltar</button>
+      <div id="detailBody"></div>
+      <div id="detailPrices"></div>
+    </section>
+
+    <section id="compareView" class="view">
+      <button class="back" onclick="go('home')">‹ Voltar</button>
+      <h2>Comparador</h2>
+      <div id="compareBody"></div>
+    </section>
+  </main>
+
+  <div id="compareBar" class="compare-bar hidden">
+    <span id="compareCount">0 selecionados</span>
+    <button id="compareBtn" class="btn primary" disabled>Comparar</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

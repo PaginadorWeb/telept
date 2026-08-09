@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: telept
+    runtime: docker
+    repo: https://github.com/PaginadorWeb/telept
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: FULL_CRAWL
+        value: "1"
+        sync: false

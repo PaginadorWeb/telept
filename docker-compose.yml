@@ -1,0 +1,14 @@
+services:
+  telept:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - telept-data:/app/data
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - TZ=Europe/Lisbon
+
+volumes:
+  telept-data:
