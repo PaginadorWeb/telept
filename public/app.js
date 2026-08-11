@@ -121,8 +121,15 @@ function setBrand(brand, el) {
   state.activeBrand = brand;
   document.querySelectorAll('.brand-chip').forEach((c) => c.classList.remove('active'));
   if (el) el.classList.add('active');
-  renderResults($('#searchInput').value.trim());
+  const cur = location.hash.replace('#', '');
+  if (cur !== 'home') location.hash = 'home';
+  else renderResults($('#searchInput').value.trim());
 }
+
+$('#searchInput').addEventListener('focus', () => {
+  const cur = location.hash.replace('#', '');
+  if (cur === 'compare' || cur === 'detail') location.hash = 'home';
+});
 
 function toggleCompare(id, el) {
   const key = String(id);
