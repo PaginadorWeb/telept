@@ -67,7 +67,7 @@ function priceChips(prices) {
 }
 
 function thumbHtml(p) {
-  if (p.image_url) return `<img loading="lazy" src="${p.image_url}" alt="${p.brand} ${p.model}" onclick="openDetail(${p.id})">`;
+  if (p.image_url) return `<img loading="lazy" referrerpolicy="no-referrer" src="${p.image_url}" alt="${p.brand} ${p.model}" onclick="openDetail(${p.id})">`;
   const letter = (p.brand || '?').charAt(0).toUpperCase();
   return `<div class="thumb ph" onclick="openDetail(${p.id})">${letter}</div>`;
 }
@@ -140,20 +140,23 @@ function toggleCompare(id, el) {
     if (el.classList.contains('add-cmp')) el.textContent = '+ Comparar';
   } else {
     if (state.compare.size >= 3) {
-      const first = [...state.compare][0];
-      state.compare.delete(first);
-      const old = document.querySelector(`[data-id="${first}"]`);
-      if (old) {
-        old.classList.remove('checked');
-        const btn = old.querySelector('.add-cmp');
-        if (btn) btn.textContent = '+ Comparar';
-      }
+      showToast('Máximo de 3 aparelhos para comparar');
+      return;
     }
     state.compare.add(key);
     card.classList.add('checked');
     if (el.classList.contains('add-cmp')) el.textContent = '✓ Adicionado à comparação';
   }
   updateCompareBar();
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
 }
 
 function updateCompareBar() {
@@ -181,7 +184,7 @@ function showDetail(phone) {
     : '';
   $('#detailBody').innerHTML = `
     <div class="detail-head">
-      ${phone.image_url ? `<img src="${phone.image_url}" alt="">` : `<div class="thumb ph big">${(phone.brand || '?').charAt(0).toUpperCase()}</div>`}
+      ${phone.image_url ? `<img referrerpolicy="no-referrer" src="${phone.image_url}" alt="">` : `<div class="thumb ph big">${(phone.brand || '?').charAt(0).toUpperCase()}</div>`}
       <div>
         <div class="brand">${phone.brand}</div>
         <h2>${phone.model}</h2>
@@ -233,7 +236,7 @@ async function renderCompare() {
       )
     ];
     const headTh = (p) =>
-      `<th class="head">${p.image_url ? `<img src="${p.image_url}" alt="">` : `<div class="thumb ph small">${(p.brand || '?').charAt(0).toUpperCase()}</div>`}<br>${
+      `<th class="head">${p.image_url ? `<img referrerpolicy="no-referrer" src="${p.image_url}" alt="">` : `<div class="thumb ph small">${(p.brand || '?').charAt(0).toUpperCase()}</div>`}<br>${
         p.brand
       }<br><b>${p.model}</b><br>${priceChips(p.prices)}</th>`;
     $('#compareBody').innerHTML = `

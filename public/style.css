@@ -229,3 +229,12 @@ main { max-width: 1100px; margin: 0 auto; padding: 16px; }
 .compare-table .head { text-align: center; }
 
 .hidden { display: none !important; }
+
+.toast {
+  position: fixed; top: 76px; left: 50%; transform: translateX(-50%);
+  background: var(--card2); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; font-weight: 600;
+  padding: 10px 18px; border-radius: 999px; z-index: 100;
+  opacity: 0; pointer-events: none; transition: opacity .2s ease;
+}
+.toast.show { opacity: 1; }
