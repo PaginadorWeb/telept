@@ -9,6 +9,3 @@ services:
     envVars:
       - key: PORT
         value: 3000
-      - key: FULL_CRAWL
-        value: "1"
-        sync: false

@@ -17,13 +17,9 @@ function run(script, args = []) {
 
 const serving = run('server.mjs').catch((e) => console.log('servidor:', e.message));
 
-const crawl = run('sync_gsm_all.mjs', ['--max-per-brand=60'])
-  .then(async () => {
-    console.log('\nCrawl concluido. A sincronizar precos...');
-    await run('sync_prices.mjs');
-    console.log('Precos atualizados.');
-  })
-  .catch((e) => console.log('crawl:', e.message));
+const prices = run('sync_prices.mjs')
+  .then(() => console.log('Precos atualizados.'))
+  .catch((e) => console.log('precos:', e.message));
 
 await Promise.race([serving]);
 process.exit(0);

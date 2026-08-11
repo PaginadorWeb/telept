@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "sync:gsm": "node scraper_gsm.mjs",
-    "sync:gsm:all": "node sync_gsm_all.mjs",
+    "sync:tech": "node sync_techapi.mjs --refresh",
     "sync:prices": "node sync_prices.mjs",
     "start": "node server.mjs",
-    "start:all": "node run_all.mjs"
+    "start:all": "node run_all.mjs",
+    "test:ui": "node test_ui.mjs"
   },
   "dependencies": {
     "axios": "^1.7.2",

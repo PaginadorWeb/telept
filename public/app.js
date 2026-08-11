@@ -36,6 +36,7 @@ function storeClass(store) {
   const s = String(store).toLowerCase();
   if (s.includes('meo')) return 'meo';
   if (s.includes('vod')) return 'voda';
+  if (s.includes('dart')) return 'dart';
   return 'nos';
 }
 
@@ -60,19 +61,25 @@ function priceChips(prices) {
 }
 
 function cardHtml(p) {
+  const inCompare = state.compare.has(String(p.id));
   return `
-    <div class="card ${state.compare.has(String(p.id)) ? 'checked' : ''}" data-id="${p.id}" onclick="openDetail(${p.id})">
-      <div class="compare-check" onclick="event.stopPropagation(); toggleCompare(${p.id}, this)">✓</div>
-      ${p.image_url ? `<img loading="lazy" src="${p.image_url}" alt="${p.brand} ${p.model}">` : ''}
-      <div class="brand-tag">${p.brand}</div>
-      <h3>${p.model}</h3>
+    <div class="card ${inCompare ? 'checked' : ''}" data-id="${p.id}">
+      ${p.image_url ? `<img loading="lazy" src="${p.image_url}" alt="${p.brand} ${p.model}" onclick="openDetail(${p.id})">` : ''}
+      <div class="brand-tag" onclick="openDetail(${p.id})">${p.brand}</div>
+      <h3 onclick="openDetail(${p.id})">${p.model}</h3>
       ${priceChips(p.prices)}
+      <button class="add-cmp" onclick="toggleCompare(${p.id}, this)">${inCompare ? '✓ Adicionado à comparação' : '+ Comparar'}</button>
     </div>
   `;
 }
 
 async function renderResults(q) {
   const box = $('#results');
+  if (!q && !state.activeBrand) {
+    box.innerHTML =
+      '<div class="status">Pesquisa um modelo (ex.: «Flip 8», «S25», «Redmi») ou toca numa marca acima.</div>';
+    return;
+  }
   box.innerHTML = '<div class="status"><div class="spinner"></div>Carregando...</div>';
   try {
     const params = new URLSearchParams();
@@ -107,18 +114,25 @@ function setBrand(brand, el) {
 
 function toggleCompare(id, el) {
   const key = String(id);
+  const card = el.closest('.card');
   if (state.compare.has(key)) {
     state.compare.delete(key);
-    el.closest('.card').classList.remove('checked');
+    card.classList.remove('checked');
+    if (el.classList.contains('add-cmp')) el.textContent = '+ Comparar';
   } else {
     if (state.compare.size >= 3) {
       const first = [...state.compare][0];
       state.compare.delete(first);
       const old = document.querySelector(`[data-id="${first}"]`);
-      if (old) old.classList.remove('checked');
+      if (old) {
+        old.classList.remove('checked');
+        const btn = old.querySelector('.add-cmp');
+        if (btn) btn.textContent = '+ Comparar';
+      }
     }
     state.compare.add(key);
-    el.closest('.card').classList.add('checked');
+    card.classList.add('checked');
+    if (el.classList.contains('add-cmp')) el.textContent = '✓ Adicionado à comparação';
   }
   updateCompareBar();
 }
@@ -140,6 +154,12 @@ function showDetail(phone) {
           .join('')}</table></div>`
     )
     .join('');
+  const siteRow = phone.manufacturer_site
+    ? `<div class="site-row">
+         <a class="btn-site" href="${phone.manufacturer_site}" target="_blank" rel="noopener">Site oficial de ${phone.manufacturer} ↗</a>
+         <a class="btn-site ghost" href="https://www.google.com/search?q=${encodeURIComponent(`${phone.brand} ${phone.model} especificações`)}" target="_blank" rel="noopener">Specs no Google ↗</a>
+       </div>`
+    : '';
   $('#detailBody').innerHTML = `
     <div class="detail-head">
       ${phone.image_url ? `<img src="${phone.image_url}" alt="">` : ''}
@@ -147,6 +167,7 @@ function showDetail(phone) {
         <div class="brand">${phone.brand}</div>
         <h2>${phone.model}</h2>
         ${priceChips(phone.prices)}
+        ${siteRow}
       </div>
     </div>
     ${specSections}

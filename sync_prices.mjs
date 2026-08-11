@@ -2,9 +2,10 @@ import db, { upsertPrice } from './db.mjs';
 import { findBestMatch } from './lib/match.mjs';
 
 const STORES = {
-  meo: { module: () => import('./lib/stores/meo.mjs') },
-  vodafone: { module: () => import('./lib/stores/vodafone.mjs') },
-  nos: { module: () => import('./lib/stores/nos.mjs') }
+  meo: { module: () => import('./lib/stores/meo.mjs'), needsPhones: false },
+  vodafone: { module: () => import('./lib/stores/vodafone.mjs'), needsPhones: false },
+  nos: { module: () => import('./lib/stores/nos.mjs'), needsPhones: false },
+  darty: { module: () => import('./lib/stores/darty.mjs'), needsPhones: true }
 };
 
 const args = {};
@@ -28,7 +29,7 @@ async function main() {
     }
     const { scrapeCatalog } = await STORES[store].module();
     console.log(`\n=== Procurando ${store} ... ===`);
-    const items = await scrapeCatalog({ limit });
+    const items = await scrapeCatalog({ limit, phones: STORES[store].needsPhones ? phones : undefined });
     let matched = 0;
     let emptyPrice = 0;
     const unmatched = [];

@@ -120,6 +120,16 @@ main { max-width: 1100px; margin: 0 auto; padding: 16px; }
 .store-price.nos { color: #fff; background: #7a4dd8; border-color: #7a4dd8; }
 .store-price.voda { color: #fff; background: #e60000; border-color: #e60000; }
 .store-price.meo { color: var(--text); background: #34d3b8; border-color: #34d3b8; }
+.store-price.dart { color: #fff; background: #0082c8; border-color: #0082c8; }
+
+.site-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.btn-site {
+  display: inline-block; padding: 10px 16px;
+  border-radius: 10px; text-decoration: none;
+  font-size: 13px; font-weight: 700;
+  background: var(--accent); color: #fff;
+}
+.btn-site.ghost { background: var(--card2); border: 1px solid var(--border); color: var(--text); }
 
 .compare-check {
   position: absolute; top: 10px; right: 10px;
@@ -128,7 +138,15 @@ main { max-width: 1100px; margin: 0 auto; padding: 16px; }
   display: flex; align-items: center; justify-content: center;
   font-size: 15px; color: #fff;
 }
+.add-cmp {
+  width: 100%; margin-top: 12px; padding: 11px;
+  border: none; border-radius: 10px;
+  background: var(--accent); color: #fff;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.add-cmp:active { transform: scale(.97); }
 .card.checked { border-color: var(--accent); }
+.card.checked .add-cmp { background: var(--green); }
 .card.checked .compare-check { background: var(--accent); border-color: var(--accent); }
 
 .compare-bar {

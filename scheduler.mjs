@@ -17,13 +17,8 @@ function run(script, args = []) {
 }
 
 async function dailyMaintenance() {
-  const full = process.env.FULL_CRAWL === '1';
-  console.log(`\n[SCHED] ${new Date().toISOString()} — a sincronizar precos...`);
+  console.log(`\n[SCHED] ${new Date().toISOString()} a sincronizar precos...`);
   await run('sync_prices.mjs');
-  console.log('[SCHED] precos atualizados. crawl do catalogo...');
-  await run('sync_gsm_all.mjs', full
-    ? ['--max-per-brand=80', '--device-delay=4000', '--listing-delay=2500', '--backoff=120000']
-    : ['--max-per-brand=12', '--device-delay=2500', '--listing-delay=2000', '--backoff=120000']);
   console.log('[SCHED] manutencao concluida.');
 }
 

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 
-for (const file of ['telept.sqlite', 'gsm_crawled.json']) {
+for (const file of ['telept.sqlite', 'techapi_index.json', 'techapi_watches.json']) {
   const target = path.join(dir, 'data', file);
   const source = path.join(dir, 'seed', file);
   if (!fs.existsSync(target) && fs.existsSync(source)) {

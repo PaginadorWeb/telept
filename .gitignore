@@ -3,5 +3,4 @@ data/
 *.log
 .git/
 .DS_Store
-uitest*
 *.png

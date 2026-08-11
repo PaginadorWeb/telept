@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-const sources = ['telept.sqlite', 'gsm_crawled.json'];
+const sources = ['telept.sqlite', 'gsm_crawled.json', 'techapi_index.json', 'techapi_watches.json'];
 
 for (const file of sources) {
   const from = path.join(here, 'data', file);
