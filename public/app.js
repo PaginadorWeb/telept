@@ -60,11 +60,17 @@ function priceChips(prices) {
     .join('')}</div>`;
 }
 
+function thumbHtml(p) {
+  if (p.image_url) return `<img loading="lazy" src="${p.image_url}" alt="${p.brand} ${p.model}" onclick="openDetail(${p.id})">`;
+  const letter = (p.brand || '?').charAt(0).toUpperCase();
+  return `<div class="thumb ph" onclick="openDetail(${p.id})">${letter}</div>`;
+}
+
 function cardHtml(p) {
   const inCompare = state.compare.has(String(p.id));
   return `
     <div class="card ${inCompare ? 'checked' : ''}" data-id="${p.id}">
-      ${p.image_url ? `<img loading="lazy" src="${p.image_url}" alt="${p.brand} ${p.model}" onclick="openDetail(${p.id})">` : ''}
+      ${thumbHtml(p)}
       <div class="brand-tag" onclick="openDetail(${p.id})">${p.brand}</div>
       <h3 onclick="openDetail(${p.id})">${p.model}</h3>
       ${priceChips(p.prices)}
@@ -99,7 +105,7 @@ async function loadBrands() {
     const brands = await api('/api/brands');
     $('#brandBar').innerHTML =
       '<button class="brand-chip" onclick="setBrand(null, this)">Todos</button>' +
-      brands.map((b) => `<button class="brand-chip" onclick="setBrand('${b}', this)">${b}</button>`).join('');
+      brands.map((b) => `<button class="brand-chip" onclick="setBrand('${b.brand.replace(/'/g, '')}', this)">${b.brand}</button>`).join('');
   } catch {
     /* chips opcionais */
   }
@@ -162,7 +168,7 @@ function showDetail(phone) {
     : '';
   $('#detailBody').innerHTML = `
     <div class="detail-head">
-      ${phone.image_url ? `<img src="${phone.image_url}" alt="">` : ''}
+      ${phone.image_url ? `<img src="${phone.image_url}" alt="">` : `<div class="thumb ph big">${(phone.brand || '?').charAt(0).toUpperCase()}</div>`}
       <div>
         <div class="brand">${phone.brand}</div>
         <h2>${phone.model}</h2>
@@ -181,10 +187,10 @@ async function openDetail(id) {
 
 async function renderDetail(id) {
   setView('detail');
-  $('#detailBody').innerHTML = '<div class="status"><div class="spinner"></div>A carregar...</div>';
+  $('#detailBody').innerHTML = '<div class="status"><div class="spinner"></div>A carregar specs...</div>';
   try {
-    const list = await api('/api/phones?');
-    const phone = list.find((p) => String(p.id) === String(id));
+    const list = await api('/api/phones?ids=' + encodeURIComponent(String(id)));
+    const phone = list[0];
     if (phone) showDetail(phone);
     else $('#detailBody').innerHTML = '<div class="status">Não encontrado.</div>';
   } catch (err) {
@@ -199,9 +205,10 @@ async function openCompare() {
 
 async function renderCompare() {
   setView('compare');
-  $('#compareBody').innerHTML = '<div class="status"><div class="spinner"></div>A preparar...</div>';
+  $('#compareBody').innerHTML = '<div class="status"><div class="spinner"></div>A preparar specs...</div>';
   try {
-    const list = await api('/api/phones?');
+    const ids = [...state.compare].join(',');
+    const list = await api('/api/phones?ids=' + encodeURIComponent(ids));
     const phones = list.filter((p) => state.compare.has(String(p.id)));
     const keys = [
       ...new Set(

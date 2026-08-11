@@ -18,7 +18,7 @@ async function main() {
   const only = args.only ? args.only.split(',') : Object.keys(STORES);
   const limit = args.limit ? Number(args.limit) : undefined;
 
-  const phones = db.prepare('SELECT id, brand, model FROM smartphones').all();
+  const phones = db.prepare('SELECT id, brand, model FROM smartphones WHERE tracked = 1').all();
   console.log(`BD: ${phones.length} telemoveis. Lojas: ${only.join(', ')} (limit ${limit ?? 'todos'})`);
 
   const summary = {};

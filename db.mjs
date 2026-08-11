@@ -33,6 +33,12 @@ db.exec(`
   );
 `);
 
+const cols = db.prepare("PRAGMA table_info(smartphones)").all().map((c) => c.name);
+if (!cols.includes('slug')) db.exec('ALTER TABLE smartphones ADD COLUMN slug TEXT');
+if (!cols.includes('kind')) db.exec("ALTER TABLE smartphones ADD COLUMN kind TEXT DEFAULT 'phone'");
+if (!cols.includes('tracked')) db.exec('ALTER TABLE smartphones ADD COLUMN tracked INTEGER DEFAULT 0');
+if (!cols.includes('catalog')) db.exec('ALTER TABLE smartphones ADD COLUMN catalog INTEGER DEFAULT 0');
+
 export const insertPhone = db.prepare(`
   INSERT INTO smartphones (brand, model, specs, image_url)
   VALUES (@brand, @model, @specs, @image_url)

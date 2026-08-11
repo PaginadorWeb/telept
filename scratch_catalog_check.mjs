@@ -1,0 +1,10 @@
+import db from './db.mjs';
+console.log('Xiaomi:', db.prepare("SELECT model FROM smartphones WHERE brand='Xiaomi' ORDER BY model LIMIT 12").all().map(r => r.model).join(' | '));
+console.log('\nOPPO:', db.prepare("SELECT model FROM smartphones WHERE brand='OPPO' ORDER BY model LIMIT 10").all().map(r => r.model).join(' | '));
+const bad = db.prepare("SELECT COUNT(*) c FROM smartphones WHERE model LIKE '%m2001%' OR model LIKE '%td-lte%' OR model LIKE '%TD-LTE%'").get();
+console.log('\ncom lixo (codenames/td-lte):', bad.c);
+const junkSamples = db.prepare("SELECT model FROM smartphones WHERE model LIKE '%m2001%' LIMIT 5").all().map(r => r.model);
+console.log('amostra ainda com codinome:', junkSamples.length ? junkSamples.join(' | ') : '(nenhum)');
+console.log('\nRedmi:', db.prepare("SELECT model FROM smartphones WHERE brand='Redmi' ORDER BY model LIMIT 8").all().map(r => r.model).join(' | '));
+console.log('\nNothing:', db.prepare("SELECT model FROM smartphones WHERE brand='Nothing' ORDER BY model LIMIT 8").all().map(r => r.model).join(' | '));
+console.log('\nTCL:', db.prepare("SELECT model FROM smartphones WHERE brand='TCL' ORDER BY model LIMIT 8").all().map(r => r.model).join(' | '));
