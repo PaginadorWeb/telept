@@ -1,0 +1,17 @@
+import db from './db.mjs';
+import fs from 'node:fs';
+const out = [];
+out.push('sem imagem: ' + db.prepare("SELECT COUNT(*) c FROM smartphones WHERE image_url IS NULL OR image_url = ''").get().c);
+out.push('sem imagem catalog: ' + db.prepare("SELECT COUNT(*) c FROM smartphones WHERE catalog=1 AND (image_url IS NULL OR image_url = '')").get().c);
+out.push('sem imagem tracked: ' + db.prepare("SELECT COUNT(*) c FROM smartphones WHERE tracked=1 AND (image_url IS NULL OR image_url = '')").get().c);
+out.push('com specs: ' + db.prepare('SELECT COUNT(*) c FROM smartphones WHERE specs IS NOT NULL').get().c);
+out.push('sem specs: ' + db.prepare('SELECT COUNT(*) c FROM smartphones WHERE specs IS NULL').get().c);
+out.push('tracked sem specs: ' + db.prepare("SELECT COUNT(*) c FROM smartphones WHERE tracked=1 AND (specs IS NULL OR specs = '{}')").get().c);
+const semImg = db.prepare("SELECT brand, model FROM smartphones WHERE image_url IS NULL OR image_url = '' LIMIT 25").all();
+out.push('exemplos sem imagem: '); 
+for (const r of semImg) out.push(`  ${r.brand} ${r.model}`);
+const chk = db.prepare("SELECT brand, model, image_url FROM smartphones WHERE tracked=1 AND brand='Apple' LIMIT 5").all();
+out.push('tracked apple img:'); 
+for (const r of chk) out.push(`  ${r.brand} ${r.model} -> ${r.image_url.slice(0, 80)}`);
+fs.writeFileSync('C:/Users/roggero/AppData/Local/Temp/opencode/img_after.txt', out.join('\n'));
+console.log('done');

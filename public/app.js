@@ -17,7 +17,13 @@ async function api(url) {
 function setView(id) {
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   document.getElementById(VIEW_IDS[id]).classList.add('active');
+  $('#compareBar').classList.toggle('in-view', id === 'compare');
   window.scrollTo({ top: 0 });
+}
+
+function backFromCompare() {
+  if (window.history.length > 1) window.history.back();
+  else location.hash = 'home';
 }
 
 function go(id) {
@@ -219,18 +225,15 @@ async function renderCompare() {
         )
       )
     ];
+    const headTh = (p) =>
+      `<th class="head">${p.image_url ? `<img src="${p.image_url}" alt="">` : `<div class="thumb ph small">${(p.brand || '?').charAt(0).toUpperCase()}</div>`}<br>${
+        p.brand
+      }<br><b>${p.model}</b><br>${priceChips(p.prices)}</th>`;
     $('#compareBody').innerHTML = `
       <table class="compare-table">
         <thead><tr>
           <th></th>
-          ${phones
-            .map(
-              (p) =>
-                `<th class="head">${p.image_url ? `<img src="${p.image_url}" alt="">` : ''}<br>${
-                  p.brand
-                }<br><b>${p.model}</b><br>${priceChips(p.prices)}</th>`
-            )
-            .join('')}
+          ${phones.map(headTh).join('')}
         </tr></thead>
         <tbody>
           ${keys
