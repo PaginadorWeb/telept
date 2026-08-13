@@ -5,6 +5,8 @@
   "scripts": {
     "sync:tech": "node sync_techapi.mjs --refresh",
     "sync:prices": "node sync_prices.mjs",
+    "sync:images": "node backfill_images.mjs",
+    "seed:refresh": "node seed_refresh.mjs",
     "start": "node server.mjs",
     "start:all": "node run_all.mjs",
     "test:ui": "node test_ui.mjs"
