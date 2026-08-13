@@ -5,7 +5,7 @@
   --border: #263041;
   --text: #e8ecf4;
   --muted: #8b96a8;
-  --accent: #3b82f6;
+  --accent: #2563eb;
   --green: #22c55e;
   --amber: #f59e0b;
   --red: #ef4444;
@@ -14,6 +14,8 @@
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+button, input, select, textarea { font-family: inherit; }
 
 html, body { margin: 0; padding: 0; }
 
@@ -76,7 +78,7 @@ body {
 main { max-width: 1100px; margin: 0 auto; padding: 16px; }
 
 .hero { text-align: center; padding: 18px 0 22px; }
-.hero h1 { font-size: 22px; margin: 0 0 6px; }
+.hero h1 { font-size: 26px; margin: 0 0 6px; }
 .hero p { color: var(--muted); margin: 0; }
 
 .status { text-align: center; color: var(--muted); padding: 26px; }
@@ -199,6 +201,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 16px; }
   background: #fff; border-radius: var(--radius); padding: 10px;
 }
 .detail-head h2 { margin: 0 0 6px; font-size: 22px; }
+
+#compareView h2 { font-size: 20px; margin: 0 0 12px; }
 .detail-head .brand { color: var(--muted); text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
 
 .spec-section { margin-top: 18px; background: var(--card); border-radius: var(--radius); overflow: hidden; }
