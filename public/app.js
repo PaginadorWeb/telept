@@ -66,10 +66,24 @@ function priceChips(prices) {
     .join('')}</div>`;
 }
 
-function thumbHtml(p) {
-  if (p.image_url) return `<img loading="lazy" referrerpolicy="no-referrer" src="${p.image_url}" alt="${p.brand} ${p.model}" onclick="openDetail(${p.id})">`;
+function phHtml(letter, cls) {
+  return `<div class="thumb ph ${cls}">${letter}</div>`;
+}
+
+function imgFallback(el, letter, cls) {
+  el.insertAdjacentHTML('afterend', phHtml(letter, cls));
+  el.remove();
+}
+
+function imgTag(p, cls) {
   const letter = (p.brand || '?').charAt(0).toUpperCase();
-  return `<div class="thumb ph" onclick="openDetail(${p.id})">${letter}</div>`;
+  if (!p.image_url) return phHtml(letter, cls);
+  return `<img loading="lazy" referrerpolicy="no-referrer" src="${p.image_url}" alt="${p.brand} ${p.model}" onerror="imgFallback(this, '${letter}', '${cls}')">`;
+}
+
+function thumbHtml(p) {
+  if (!p.image_url) return phHtml((p.brand || '?').charAt(0).toUpperCase(), '');
+  return `<img loading="lazy" referrerpolicy="no-referrer" src="${p.image_url}" alt="${p.brand} ${p.model}" onerror="imgFallback(this, '${(p.brand || '?').charAt(0).toUpperCase()}', '')" onclick="openDetail(${p.id})">`;
 }
 
 function cardHtml(p) {
@@ -184,7 +198,7 @@ function showDetail(phone) {
     : '';
   $('#detailBody').innerHTML = `
     <div class="detail-head">
-      ${phone.image_url ? `<img referrerpolicy="no-referrer" src="${phone.image_url}" alt="">` : `<div class="thumb ph big">${(phone.brand || '?').charAt(0).toUpperCase()}</div>`}
+      ${phone.image_url ? `<img referrerpolicy="no-referrer" src="${phone.image_url}" alt="" onerror="imgFallback(this, '${(phone.brand || '?').charAt(0).toUpperCase()}', 'big')">` : phHtml((phone.brand || '?').charAt(0).toUpperCase(), 'big')}
       <div>
         <div class="brand">${phone.brand}</div>
         <h2>${phone.model}</h2>
@@ -236,10 +250,11 @@ async function renderCompare() {
       )
     ];
     const headTh = (p) =>
-      `<th class="head">${p.image_url ? `<img referrerpolicy="no-referrer" src="${p.image_url}" alt="">` : `<div class="thumb ph small">${(p.brand || '?').charAt(0).toUpperCase()}</div>`}<br>${
+      `<th class="head">${p.image_url ? `<img referrerpolicy="no-referrer" src="${p.image_url}" alt="" onerror="imgFallback(this, '${(p.brand || '?').charAt(0).toUpperCase()}', 'small')">` : phHtml((p.brand || '?').charAt(0).toUpperCase(), 'small')}<br>${
         p.brand
       }<br><b>${p.model}</b><br>${priceChips(p.prices)}</th>`;
     $('#compareBody').innerHTML = `
+      <div class="compare-wrap">
       <table class="compare-table">
         <thead><tr>
           <th></th>
@@ -256,6 +271,7 @@ async function renderCompare() {
             .join('')}
         </tbody>
       </table>
+      </div>
     `;
   } catch (err) {
     $('#compareBody').innerHTML = `<div class="status">Erro: ${err.message}</div>`;

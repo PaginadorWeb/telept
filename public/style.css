@@ -221,7 +221,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 16px; }
 .price-card .out { color: var(--red); font-weight: 700; }
 .price-card a { color: var(--muted); font-size: 12px; }
 
-.compare-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; }
+.compare-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; min-width: 520px; }
+.compare-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .compare-table th, .compare-table td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
 .compare-table th { background: var(--card2); }
 .compare-table td.k { color: var(--muted); width: 30%; white-space: nowrap; }
