@@ -14,6 +14,16 @@ const GSM_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KH
 const MD = 'https://www.mobiledokan.com';
 const GSM = 'https://www.gsmarena.com';
 
+const REJECTED_FILE = path.join(process.cwd(), 'data', 'img_rejected.json');
+
+function loadRejected() {
+  try {
+    return new Set(JSON.parse(fs.readFileSync(REJECTED_FILE, 'utf8')).ids);
+  } catch {
+    return new Set();
+  }
+}
+
 function loadState() {
   try {
     return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
@@ -34,7 +44,7 @@ const norm = (s) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-const tok = (s) => norm(s).split(' ').filter((t) => t.length >= 2);
+const tok = (s) => norm(s).split(' ').filter((t) => t.length >= 2 || /^\d+$/.test(t));
 
 async function downloadSitemap(url) {
   const r = await fetch(url, { headers: { 'User-Agent': GSM_UA }, signal: AbortSignal.timeout(120000) });
@@ -70,7 +80,7 @@ function matchMd(phones, mdIndex) {
   }
   return phones.map((ph) => {
     const wantTokens = tok(`${ph.brand} ${ph.model}`);
-    if (!wantTokens.length) return { ph, v: null };
+    if (!wantTokens.length) return { ph, v: null, score: 0 };
     const wantFull = norm(`${ph.brand} ${ph.model}`);
     const exact = mdIndex.get(wantFull);
     if (exact) return { ph, v: exact, score: 1 };
@@ -86,13 +96,16 @@ function matchMd(phones, mdIndex) {
     }
     let best = null;
     let bestScore = 0;
+    if (wantTokens.every((t) => /^\d+$/.test(t))) return { ph, v: null, score: 0 };
+    const wantKey = wantTokens.filter((t) => !['sm', 'lte', '5g', '4g', 'dual', 'sim', 'td', 'hk', 'tw', 'uw', 'cn', 'in', 'kr', 'jp', 'us', 'eu', 'na', 'apac', 'latam', 'global', 'regional', 'international', 'gms', 'ds', 'ee', 'dsds', 'nfc'].includes(t));
     for (const v of cands.values()) {
       const vt = tok(v.name);
-      const covered = wantTokens.filter((t) => vt.includes(t)).length;
-      const score = covered / wantTokens.length;
+      const covered = wantKey.filter((t) => vt.includes(t)).length;
+      const score = covered / wantKey.length;
       if (score > bestScore) { bestScore = score; best = v; }
     }
-    return { ph, v: best, score: bestScore >= 0.6 ? bestScore : 0 };
+    const strong = bestScore >= 0.9 && wantKey.length >= 3 && (best ? tok(best.name).length >= 3 : false);
+    return { ph, v: strong ? best : null, score: strong ? bestScore : 0 };
   });
 }
 
@@ -101,7 +114,10 @@ async function fetchOg(slugPath) {
   if (!r.ok) return null;
   const html = await r.text();
   const m = html.match(/property="og:image"\s+content="([^"]+)"/) || html.match(/<meta\s+itemprop="image"\s+content="([^"]+)"/);
-  return m ? m[1] : null;
+  if (!m) return null;
+  const url = m[1];
+  const base = url.split('/').pop();
+  return /^\d{9,}[a-z0-9]{2,10}\.(webp|jpe?g|png|gif)$/i.test(base) ? null : url;
 }
 
 const update = db.prepare('UPDATE smartphones SET image_url = ? WHERE id = ?');
@@ -137,6 +153,9 @@ const targets = db.prepare(`
 `).all();
 console.log(`alvos: ${targets.length}`);
 
+const rejectedIds = loadRejected();
+console.log(`ids rejeitados pelo verify (saltados): ${rejectedIds.size}`);
+
 console.log('Baixando sitemaps mobiledokan...');
 const [mobileS, watchS] = await Promise.all([
   downloadSitemap('https://www.mobiledokan.com/sitemap/mobile.xml'),
@@ -145,8 +164,8 @@ const [mobileS, watchS] = await Promise.all([
 const mdIndex = buildMdIndex([...mobileS, ...watchS]);
 console.log(`indice mobiledokan: ${mdIndex.size} paginas unicas`);
 
-const todo = targets.filter((ph) => !state.done[ph.id]);
-console.log(`a processar: ${todo.length}`);
+const todo = targets.filter((ph) => !state.done[ph.id] && !rejectedIds.has(ph.id));
+console.log(`a processar: ${todo.length} (${targets.length - todo.length} em estado/cache)`);
 
 const matched = matchMd(todo, mdIndex);
 const withMatch = matched.filter((x) => x.v);
@@ -176,7 +195,8 @@ for (const { ph, v } of matched) {
     okMd++;
     continue;
   }
-  if (args.gsm !== 'false' && !v) {
+  if (args.gsm !== 'false' && !v && !gsm429) {
+    await new Promise((r) => setTimeout(r, PAGE_DELAY));
     const img = await gsmFallback(ph);
     if (img === '429') { gsm429 = true; continue; }
     if (img) { update.run(img, ph.id); state.done[ph.id] = 'ok-gsm'; continue; }
